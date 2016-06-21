@@ -1,5 +1,7 @@
 FROM debian
 
+ENV CONSUL_TPL_VERSION 0.15.0
+
 RUN buildDeps=' \
     gcc \
     curl \
@@ -13,6 +15,7 @@ set -x \
     ucspi-tcp \
     daemontools \
     make \
+    unzip \
 && cd /usr/src \
 && curl https://cr.yp.to/djbdns/djbdns-1.05.tar.gz -o djbdns-1.05.tar.gz \
 && tar -xf djbdns-1.05.tar.gz \
@@ -22,6 +25,10 @@ set -x \
 && make setup check \
 && cd / \
 && rm -rf /usr/src/* \
+&& curl -sSL https://releases.hashicorp.com/consul-template/${CONSUL_TPL_VERSION}/consul-template_${CONSUL_TPL_VERSION}_linux_amd64.zip -o consul-template_${CONSUL_TPL_VERSION}_linux_amd64.zip \
+&& unzip consul-template_${CONSUL_TPL_VERSION}_linux_amd64.zip  -d /usr/local/bin \
+&& chmod +x /usr/local/bin/consul-template \
+&& rm consul-template_${CONSUL_TPL_VERSION}_linux_amd64.zip \
 && apt-get -y purge --auto-remove $buildDeps \
 && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
